@@ -12,7 +12,7 @@
           class="text-l text-white font-normal"
         >Find or create your best plan to visit Iran based on +300 plans designed by professional tour guides and travelers</p>
       </div>
-      <search-bar-cm :cities="cities" @toggleSearch="search"></search-bar-cm>
+      <search-bar-cm :cities="cities"></search-bar-cm>
     </div>
   </div>
 </template>
@@ -107,17 +107,18 @@ export default {
   },
   async created() {
     try {
+      // THERE IS CORS ERROR IN YOUR API SO I COULD NOT GET RESPONSE
       let res = await HTTPClient.getRequest(GET_CITES);
     } catch (error) {
-      throw e;
+      // throw error;
     }
   },
   methods: {
     ...mapMutations({
       addCities : 'addCities'
     }),
-    search(cities) {
-      this.$store.commit('addCities',cities)
+    search({cities}) {
+      this.addCities(cities)
     }
   }
 };

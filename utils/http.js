@@ -1,4 +1,4 @@
-export default HTTP = class {
+export default class {
   static async getRequest(path, data, header) {
     try {
 
@@ -15,7 +15,7 @@ export default HTTP = class {
     }
   }
 
-  static postRequest(path, data, header) {
+  static async postRequest(path, data, header) {
     try {
       let response =  await fetch(path, {
         method: 'POST',

@@ -93,10 +93,12 @@
         </div>
       </div>
     </div>
-    <button
-      @click="search"
+    <a
+      v-if="showSearchButton"
+      target="_blank"
+      :href="`/itirenanties?cities=${JSON.stringify(selectedCities.map(city=>city.name))}`"
       class="bg-red-500 hover:bg-red-400 text-white text-sm py-1 px-4 rounded"
-    >Search</button>
+    >Search</a>
   </div>
 </template>
 
@@ -107,8 +109,8 @@ export default {
     cities: {
       type: Array
     },
-    selectedFilters: {
-      type: Object
+    defaultCities: {
+      type: Array
     }
   },
   data() {
@@ -186,14 +188,32 @@ export default {
       ]
     };
   },
+  mounted() {
+    if (this.defaultCities) {
+      this.processDefaultCities()
+    }
+  },
   computed: {
     destionationButton() {
       return this.stringCitiesButtonDisplay
         ? this.stringCitiesButtonDisplay.slice(1)
         : "Destination";
+    },
+    showSearchButton() {
+      return this.selectedCities.length>0 &&
+      this.citiesStatus === false
     }
   },
   methods: {
+    processDefaultCities() {
+      this.defaultCities.forEach(item =>
+        this.selectedCities.push(
+          this.cities.find(city => item === city.name)
+        )
+      );
+
+      this.applyCities();
+    },
     toggleCities() {
       this.datesStatus = false;
       this.durationStatus = false;
@@ -220,17 +240,16 @@ export default {
     applyCities() {
       this.stringCitiesButtonDisplay = this.selectedCities.reduce(
         (pre, cur) => pre + "," + cur.name,
-        this.stringCitiesButtonDisplay
+        ''
       );
       this.citiesStatus = false;
     },
-    cancelCities() {
+    cancelCities() {  
+    
       this.citiesStatus = false;
       this.stringCitiesButtonDisplay = "";
       this.selectedCities = [];
-    },
-    search() {
-      this.$emit("toggleSearch", this.selectedCities);
+      this.processDefaultCities()
     }
   }
 };
