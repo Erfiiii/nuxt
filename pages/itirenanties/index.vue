@@ -2,22 +2,36 @@
   <div class="container px-10">
     <search-bar-cm :cities="cities" :defaultCities="selectedCities"></search-bar-cm>
     <div class="cards">
-      <div class="item p-10 rounded-b-lg border-2 my-5" v-for="item in tours">
-        <p>{{calculateTourDays(item)}} in {{item.cities.map(city=>city.name).join(', ')}}</p>
+      <nuxt-link
+        :to="{name: 'itirenanties-slug', params:{slug:item.slug}}"
+        class="item block cursor-pointer p-10 rounded-b-lg border-2 my-5"
+        v-for="item in tours"
+        :key="item.slug"
+      >
+        <p>{{calculateTourDays(item)}} days in {{item.cities.map(city=>city.name).join(', ')}}</p>
         <p class="text" v-if="item.totalPrice.min">From ${{item.totalPrice.min}} per person</p>
         <div class="images block flex align-middle mt-5">
-          <img class="image rounded-lg border-2 inline-block mx-2 ml-0" v-for="image in processImages(item.cities).slice(0,3)" :src="image.src" :alt="image.alt" />
-          <div v-if="processImages(item.cities).length > 3" class="image bg-gray-300 inline-block mx-2 ml-0 text-center rounded-lg text-white text-3xl">...</div>
+          <img
+            class="image rounded-lg border-2 inline-block mx-2 ml-0"
+            v-for="image in processImages(item.cities).slice(0,3)"
+            :src="image.src"
+            :alt="image.alt"
+            :key="image.src"
+          />
+          <div
+            v-if="processImages(item.cities).length > 3"
+            class="image bg-gray-300 inline-block mx-2 ml-0 text-center rounded-lg text-white text-3xl"
+          >...</div>
         </div>
-      </div>
+      </nuxt-link>
     </div>
   </div>
 </template>
 
 <script>
-import SearchBarCm from "../components/SearchBar";
-import HTTPClient from "../utils/http";
-import { GET_ITINENARIES_BY_CITY } from "../utils/endpoints";
+import SearchBarCm from "../../components/SearchBar";
+import HTTPClient from "../../utils/http";
+import { GET_ITINENARIES_BY_CITY } from "../../utils/endpoints";
 
 export default {
   data() {
@@ -718,9 +732,13 @@ export default {
     SearchBarCm
   },
   async created() {
-    let citiesForSearch = this.$route.query.cities;
-    this.selectedCities = JSON.parse(citiesForSearch);
     try {
+      if (!this.$route.query.cities) {
+        this.$router.push({ name: "index" });
+        return;
+      }
+      let citiesForSearch = this.$route.query.cities;
+      this.selectedCities = JSON.parse(citiesForSearch);
       let res = await HTTPClient.postRequest(
         `${GET_ITINENARIES_BY_CITY}?cities=${citiesForSearch}`
       );
@@ -740,16 +758,16 @@ export default {
       item.map(city => {
         totalImages = [...city.images, ...totalImages];
       });
-      return totalImages
+      return totalImages;
     }
   }
 };
 </script>
 
 <style scoped>
-  .image {
-    width: 112px;
-    height: 62px;
-    /* background-size: cover */
-  }
+.image {
+  width: 112px;
+  height: 62px;
+  /* background-size: cover */
+}
 </style>
